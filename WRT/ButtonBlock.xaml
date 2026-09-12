@@ -1,0 +1,14 @@
+﻿<UserControl x:Class="WRT.ButtonBlock"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WRT"
+             mc:Ignorable="d" 
+             d:DesignHeight="50" d:DesignWidth="160"
+             x:Name="btn"
+             Background="Transparent">
+    <Grid>
+        <Button HorizontalAlignment="Center" VerticalAlignment="Center" Width="150" Height="40" Click="MenuButtonPress" Content="{Binding ButtonText, ElementName=btn}" TextBlock.Foreground="#004953"/>
+    </Grid>
+</UserControl>

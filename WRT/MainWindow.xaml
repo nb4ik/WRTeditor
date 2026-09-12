@@ -1,9 +1,11 @@
 ﻿<Window x:Class="WRT.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WRT"
+        Style="{StaticResource MaterialDesignWindow}"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="450" ResizeMode="NoResize">
     <Grid>
@@ -15,6 +17,11 @@
             <RowDefinition Height="40*"/>
             <RowDefinition Height="177*"/>
         </Grid.RowDefinitions>
+        <!--цвет верхней панели-->
+        <Grid Background="#FFCDDC39"/>
+        <Grid Grid.Column="1" Background="#FFCDDC39"/>
+        <!--попробовать синие оттенки-->
+        <!--цвет верхней панели-->
         <StackPanel Grid.Column="0" Grid.Row="0" HorizontalAlignment="Right" Margin="0, 0, 10, 0">
             <TextBlock Text="Zapret version"/>
             <TextBlock Text="TG WS Proxy"/>
@@ -22,24 +29,25 @@
             <TextBlock Text="Стратегия zapret"/>
         </StackPanel>
         <StackPanel Grid.Column="1" Grid.Row="0" Margin="10, 0, 0, 0">
-            <TextBlock Text="${version}"/>
-            <TextBlock Text="${Proxy}"/>
-            <TextBlock Text="${hosts}"/>
-            <TextBlock Text="${Стратегия}"/>
+            <TextBlock x:Name="ZapVer" Text="none"/>
+            <TextBlock x:Name="Proxy" Text="none"/>
+            <TextBlock x:Name="Hosts" Text="none"/>
+            <TextBlock x:Name="Strategy" Text="none"/>
         </StackPanel>
         <ScrollViewer Grid.Column="1" Grid.Row="1">
-            <StackPanel Margin="0,10,0,10">
-                <Button Width="150" Height="40" Margin="0,0,0,5"/>
-                <Button Width="150" Height="40" Margin="0,0,0,5"/>
-                <Button Width="150" Height="40" Margin="0,0,0,5"/>
-                <Button Width="150" Height="40" Margin="0,0,0,5"/>
-                <Button Width="150" Height="40" Margin="0,0,0,5"/>
-                <Button Width="150" Height="40" Margin="0,0,0,5"/>
-                <Button Width="150" Height="40" Margin="0,0,0,5"/>
-                <Button Width="150" Height="40" Margin="0,0,0,5"/>
-                <Button Width="150" Height="40" Margin="0,0,0,5"/>
-            </StackPanel>
+            <ItemsControl>
+                <!--кнопки меню-->
+                <local:ButtonBlock Content="{Binding ButtonText}"/>
+            </ItemsControl>
         </ScrollViewer>
+        <Grid Grid.Row="1">
+            <StackPanel VerticalAlignment="Center">
+                <TextBox x:Name="loginBox" materialDesign:HintAssist.Hint="login" Width="150" Height="25" Margin="10, 0, 10, 10"/>
+                <TextBox x:Name="passwordBox" materialDesign:HintAssist.Hint="password" Width="150" Height="25" Margin="10, 10, 10, 10"/>
+                <CheckBox x:Name="SavePasswdCheckBox" Content="Save password" Margin="25, 10, 10, 10"/>
+                <Button x:Name="connectButton" Width="150" Height="30" Content="Connect" TextBlock.Foreground="#004953" Click="ConnectToServer" Margin="10, 10, 10, 10"/>
+            </StackPanel>
+        </Grid>
     </Grid>
 
 </Window>
