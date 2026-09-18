@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,52 +15,91 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace WRT
 {
-    /// <summary>
-    /// Логика взаимодействия для MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
-        ShellStream globalStreamRead;
+        private SshClient _sshClient;
+        private ShellStream _globalStreamRead;
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        private void ConnectToServer(object sender, RoutedEventArgs e)
+        private async void ConnectToServer(object sender, RoutedEventArgs e)
         {
             string username = loginBox.Text;
             string password = passwordBox.Text;
 
-            using (var client = new SshClient("192.168.1.1", username, password))
+            if (sender is System.Windows.Controls.Button connectButton)
             {
-                try
-                {
-                    client.Connect();
-                    globalStreamRead = client.CreateShellStream("custom_term", 80, 24, 800, 600, 1024);
-                    globalStreamRead.WriteLine("sh <(wget -O - https://raw.githubusercontent.com/StressOzz/Zapret-Manager/main/Zapret-Manager.sh)");
-                    System.Threading.Thread.Sleep(3000);
+                connectButton.IsEnabled = false;
+            }
 
-                    string output = globalStreamRead.Read();
-                    string[] lines = output.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            DisconnectSsh();
 
-                    ZapVer.Text = lines[43];
-                    Proxy.Text = lines[44];
-                    Hosts.Text = lines[45];
-                    Strategy.Text = lines[46];
-                }
-                catch (Exception ex) { }
+            try
+            {
+                _sshClient = new SshClient("192.168.1.1", username, password);
+
+                await Task.Run(() => _sshClient.Connect());
+
+                _globalStreamRead = _sshClient.CreateShellStream("custom_term", 80, 24, 800, 600, 1024);
+
+                _globalStreamRead.WriteLine("sh <(wget -O - https://raw.githubusercontent.com/StressOzz/Zapret-Manager/main/Zapret-Manager.sh)");
+
+                var menuPattern = new Regex(@"выбор|пункт|[:\]>]\s*$", RegexOptions.IgnoreCase);
+
+                string output = await _globalStreamRead.ExpectAsync(menuPattern, TimeSpan.FromSeconds(15));
+
+                string ansiPattern = @"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])";
+                string cleanText = Regex.Replace(output, ansiPattern, string.Empty);
+
+                File.WriteAllText("test.txt", cleanText);
+
+                string[] lines = cleanText.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+                ZapVer.Text = lines.FirstOrDefault(l => l.Contains("Zapret:              ")).Substring(21) ?? "Не найдено";
+                Proxy.Text = lines.FirstOrDefault(l => l.Contains("TG WS Proxy")).Substring(21) ?? "Не найдено";
+                Hosts.Text = lines.FirstOrDefault(l => l.Contains("hosts")).Substring(21) ?? "Не найдено";
+                Strategy.Text = lines.FirstOrDefault(l => l.Contains("Стратегия")).Substring(21) ?? "Не найдено";
 
             }
-        }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка подключения или выполнения: {ex.Message}");
+                DisconnectSsh();
+            }
+            finally
+            {
+                if (sender is System.Windows.Controls.Button connectBtn)
+                {
+                    connectBtn.IsEnabled = true;
+                }
+            }
 
+            //отрисовка кнопок меню
+
+        }
+        private void DisconnectSsh()
+        {
+            _globalStreamRead?.Dispose();
+            _globalStreamRead = null;
+
+            if (_sshClient != null)
+            {
+                if (_sshClient.IsConnected) _sshClient.Disconnect();
+                _sshClient.Dispose();
+                _sshClient = null;
+            }
+        }
         private void MenuButtonPress(object sender, RoutedEventArgs e, string output)
         {
             try
             {
-                globalStreamRead.WriteLine(output);
+                _globalStreamRead.WriteLine(output);
             }
             catch (Exception ex) { }
         }

@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:WRT"
         Style="{StaticResource MaterialDesignWindow}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="450" ResizeMode="NoResize">
+        Title="WRTconnect" Height="450" Width="450" ResizeMode="NoResize" Icon="/Openwrt.png">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
@@ -21,7 +21,6 @@
         <Grid Background="#FFCDDC39"/>
         <Grid Grid.Column="1" Background="#FFCDDC39"/>
         <!--попробовать синие оттенки-->
-        <!--цвет верхней панели-->
         <StackPanel Grid.Column="0" Grid.Row="0" HorizontalAlignment="Right" Margin="0, 0, 10, 0">
             <TextBlock Text="Zapret version"/>
             <TextBlock Text="TG WS Proxy"/>
