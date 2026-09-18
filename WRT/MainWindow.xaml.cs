@@ -61,10 +61,19 @@ namespace WRT
 
                 string[] lines = cleanText.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-                ZapVer.Text = lines.FirstOrDefault(l => l.Contains("Zapret:              ")).Substring(21) ?? "Не найдено";
-                Proxy.Text = lines.FirstOrDefault(l => l.Contains("TG WS Proxy")).Substring(21) ?? "Не найдено";
-                Hosts.Text = lines.FirstOrDefault(l => l.Contains("hosts")).Substring(21) ?? "Не найдено";
-                Strategy.Text = lines.FirstOrDefault(l => l.Contains("Стратегия")).Substring(21) ?? "Не найдено";
+                string targetZap = lines.FirstOrDefault(l => l.Contains("Zapret:              "));
+                ZapVer.Text = targetZap != null && targetZap.Length >= 21 ? targetZap.Substring(21).Trim() : "Не найдено";
+
+                string targetProxy = lines.FirstOrDefault(l => l.Contains("TG WS Proxy"));
+                Proxy.Text = targetProxy != null && targetProxy.Length >= 21 ? targetProxy.Substring(21).Trim() : "Не найдено";
+
+                string targetHosts = lines.FirstOrDefault(l => l.Contains("hosts"));
+                Hosts.Text = targetHosts != null && targetHosts.Length >= 21 ? targetHosts.Substring(21).Trim() : "Не найдено";
+
+                string targetStrategy = lines.FirstOrDefault(l => l.Contains("Стратегия"));
+                Strategy.Text = targetStrategy != null && targetStrategy.Length >= 21 ? targetStrategy.Substring(21).Trim() : "Не найдено";
+
+                
 
             }
             catch (Exception ex)
